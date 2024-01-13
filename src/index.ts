@@ -1,22 +1,24 @@
-import express, { Request, Response } from "express";
-import mongoose from "mongoose";
-import cookieParser from "cookie-parser";
-import compression from "compression";
-import dotenv from "dotenv";
+import express from "express";
+import mongoose, { ConnectOptions } from "mongoose";
+import { Mongoose } from "mongoose";
+import bodyParser from "body-parser";
+// import * as taskRoutes from "./routes/taskRoutes";
+import taskRoutes from "./routes/taskRoutes";
 
+import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cookieParser());
+console.log(process.env.PORT);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello from my ts-app.");
-});
+mongoose.connect(process.env.MONGODB_URI || "");
+
+app.use(bodyParser.json());
+// app.use("/api", taskRoutes);
+app.use("/api", taskRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`server is runnign on port ${PORT}`);
 });
