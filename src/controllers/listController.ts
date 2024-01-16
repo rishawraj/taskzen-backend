@@ -7,7 +7,15 @@ export const createList = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const listData = req.body as ListType;
+    listData.user = req.user.userId;
+    //? add tasks??
+
     const newList = new List(listData);
     const savedList = await newList.save();
 
@@ -23,7 +31,12 @@ export const getAllLists = async (
   res: Response
 ): Promise<void> => {
   try {
-    const lists = await List.find();
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const lists = await List.find({ user: req.user.userId });
     res.status(200).json(lists);
   } catch (error) {
     console.error("Error getting Lists:", error);
@@ -36,6 +49,11 @@ export const getListById = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const listId = req.params.id;
 
     const list = await List.findById(listId);
@@ -56,6 +74,11 @@ export const updateListById = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const listId = req.params.id;
     const updateListData = req.body as ListType;
 
@@ -68,7 +91,7 @@ export const updateListById = async (
       return;
     }
 
-    res.status(200).json(updateListById);
+    res.status(200).json(updatedList);
   } catch (error) {
     console.error("Error updating list by ID:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -80,6 +103,11 @@ export const deleteListById = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const listId = req.params.id;
     const deletedList = await List.findByIdAndDelete(listId);
 

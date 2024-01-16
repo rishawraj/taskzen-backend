@@ -1,10 +1,10 @@
 import express from "express";
-import mongoose, { ConnectOptions } from "mongoose";
-import { Mongoose } from "mongoose";
-import bodyParser from "body-parser";
+import mongoose from "mongoose";
+// import taskRoutes from "./routes/taskRoutes.js";
 import taskRoutes from "./routes/taskRoutes";
 import listRoutes from "./routes/listRoutes";
 import tagRoutes from "./routes/tagRoutes";
+import authRoutes from "./routes/authRoutes";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -19,6 +19,7 @@ app.use(express.json());
 app.use("/api", taskRoutes);
 app.use("/api", listRoutes);
 app.use("/api", tagRoutes);
+app.use("/api", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);

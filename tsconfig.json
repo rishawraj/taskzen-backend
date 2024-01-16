@@ -2,12 +2,18 @@
 //   "compilerOptions": {
 //     "module": "NodeNext",
 //     "moduleResolution": "NodeNext",
+//     "target": "es6",
 //     "baseUrl": "src",
-//     "outDir": "dist",
+//     "strict": true,
 //     "sourceMap": true,
-//     "noImplicitAny": true
+//     // "esModuleInterop": true,
+//     // "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "outDir": "./dist"
+//     // "noImplicitAny": true,
+//     // "noUnusedLocals": true
 //   },
-//   "include": ["src/**/*"],
+//   "include": ["src/**/*.ts"],
 //   "exclude": ["node_modules"]
 // }
 

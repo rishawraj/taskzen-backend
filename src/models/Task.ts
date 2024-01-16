@@ -1,31 +1,26 @@
-import { Schema, model, connect, Types } from "mongoose";
-import { TaskType } from "../types/types";
+import { Schema, model, Types } from "mongoose";
+import { TaskType, SubTaskType } from "../types/types";
+
+const subTaskSchema = new Schema<SubTaskType>({
+  _id: {
+    type: Schema.Types.ObjectId,
+    default: () => new Types.ObjectId(),
+    required: true,
+  },
+  title: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+});
 
 const taskSchema = new Schema<TaskType>(
   {
-    _id: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-      required: true,
-    },
-
     title: { type: String, required: true },
     completed: { type: Boolean, default: false, required: true },
     description: { type: String },
-    selectedListItem: { type: String },
+    selectedListItem: { type: Schema.Types.ObjectId, ref: "List" },
     dueDate: { type: Date, default: null },
-    tags: [{ id: { type: String }, name: { type: String } }],
-    subTasks: [
-      {
-        _id: {
-          type: Schema.Types.ObjectId,
-          default: () => new Types.ObjectId(),
-          required: true,
-        },
-        title: { type: String, required: true },
-        completed: { type: Boolean, default: false },
-      },
-    ],
+    tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
+    subTasks: [subTaskSchema],
+    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true } // Add timestamps for createdAt and updatedAt
 );

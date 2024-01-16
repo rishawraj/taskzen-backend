@@ -4,7 +4,12 @@ import { TagType } from "../types/types";
 
 export const createTag = async (req: Request, res: Response): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     const tagData = req.body as TagType;
+    tagData.user = req.user.userId;
     const newTag = new Tag(tagData);
     const savedTag = await newTag.save();
 
@@ -14,12 +19,17 @@ export const createTag = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 export const getAllTags = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const tags = await Tag.find();
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    const tags = await Tag.find({ user: req.user.userId });
     res.status(200).json(tags);
   } catch (error) {
     console.error("Error getting Tags:", error);
@@ -31,11 +41,16 @@ export const getTagById = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     const tagId = req.params.id;
     const tag = await Tag.findById(tagId);
 
     if (!tag) {
       res.status(404).json({ error: "Tag not found" });
+      return;
     }
     res.status(200).json(tag);
   } catch (error) {
@@ -48,6 +63,10 @@ export const updateTagById = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     const tagId = req.params.id;
     const updatedTagData = req.body as TagType;
 
@@ -71,6 +90,10 @@ export const deleteTagById = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
     const tagId = req.params.id;
     const deletedTag = await Tag.findByIdAndDelete(tagId);
     if (!deletedTag) {

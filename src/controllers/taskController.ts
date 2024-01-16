@@ -9,7 +9,14 @@ export const createTask = async (
   res: Response
 ): Promise<void> => {
   try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const taskData = req.body as TaskType;
+    taskData.user = req.user.userId;
+
     const newTask = new Task(taskData);
     const savedTask = await newTask.save();
     res.status(201).json(savedTask);
@@ -27,7 +34,14 @@ export const getAllTasks = async (
   console.log("getallTasks called");
 
   try {
-    const tasks = await Task.find();
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const userID = req.user.userId;
+
+    const tasks = await Task.find({ user: userID });
     res.status(200).json(tasks);
   } catch (error) {
     console.error("Error getting tasks:", error);
