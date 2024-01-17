@@ -5,6 +5,7 @@ import listRoutes from "./routes/listRoutes";
 import tagRoutes from "./routes/tagRoutes";
 import authRoutes from "./routes/authRoutes";
 import compression from "compression";
+import cors from "cors";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -16,6 +17,7 @@ mongoose.connect(process.env.MONGODB_URI || "");
 
 app.use(express.json());
 app.use(compression());
+app.use(cors());
 
 app.use("/api", taskRoutes);
 app.use("/api", listRoutes);
