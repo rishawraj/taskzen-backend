@@ -6,6 +6,9 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import bcrypt from "bcrypt";
+import { Task } from "../models/Task";
+import { List } from "../models/List";
+import { Tag } from "../models/Tag";
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || "";
 
@@ -23,7 +26,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       JWT_SECRET_KEY
     );
 
-    res.status(200).json({ token, userId: user._id });
+    res.status(200).json({ token, userId: user._id, username: user.username });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -41,43 +44,6 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error("Error Signing Up", error);
     res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-//!===================================================
-
-export const createUser = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const userData = req.body as UserType;
-    const newUser = new User(userData);
-    const savedUser = await newUser.save();
-
-    res.status(201).json(savedUser);
-  } catch (error) {
-    console.error("Error creating User:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-export const getUserById = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const userId = req.params.id;
-    const user = await User.findById(userId);
-
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Error getting user by ID:", error);
-    res.status(500).json({ error: "Internal Sever Error" });
   }
 };
 
@@ -115,6 +81,12 @@ export const deleteUserById = async (
       res.status(404).json({ error: "User not found" });
       return;
     }
+
+    // delete all tasks , list and tags associated with the user
+    await Task.deleteMany({ user: userId });
+    await List.deleteMany({ user: userId });
+    await Tag.deleteMany({ user: userId });
+
     res.status(200).json(deletedUser);
   } catch (error) {
     console.error("Error deleting the user by ID:", error);

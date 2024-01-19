@@ -25,6 +25,24 @@ export const createTask = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+export const deleteAllTasks = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const deletedTasks = await Task.deleteMany();
+
+    res.status(201).json({ message: "All tasks deleted", deletedTasks });
+  } catch (error) {
+    console.error("Error deleting tasks:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 // Get all tasks
 export const getAllTasks = async (

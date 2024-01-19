@@ -47,15 +47,9 @@ export interface UserType {
   tags: Types.ObjectId[];
 }
 
-// Define a custom Request interface that includes the user property
-// export interface CustomRequest<UserType = {}> extends Request {
-//   user?: UserType & Document;
-// }
-
 declare global {
   namespace Express {
     interface Request {
-      // user?: { id: Types.ObjectId }; // Adjust the type according to your user structure
       user: {
         email: string;
         userId: Types.ObjectId;

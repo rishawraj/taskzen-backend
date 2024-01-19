@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Tag } from "../models/Tag";
 import { TagType } from "../types/types";
+import { Task } from "../models/Task";
 
 export const createTag = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -33,6 +34,25 @@ export const getAllTags = async (
     res.status(200).json(tags);
   } catch (error) {
     console.error("Error getting Tags:", error);
+    res.status(500).json({ error: "Internal Sever Error" });
+  }
+};
+
+export const deleteAllTags = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const deletedTags = await Tag.deleteMany();
+    res.status(200).json({ message: "deleted all tags", deletedTags });
+  } catch (error) {
+    console.error("Error getting Tags:", error);
+    res.status(500).json({ error: "Internal Sever Error" });
   }
 };
 
@@ -55,6 +75,7 @@ export const getTagById = async (
     res.status(200).json(tag);
   } catch (error) {
     console.error("Error getting tag by ID:", error);
+    res.status(500).json({ error: "Internal Sever Error" });
   }
 };
 
@@ -100,6 +121,10 @@ export const deleteTagById = async (
       res.status(404).json({ error: "Task not found" });
       return;
     }
+
+    // Remove tag reference from tasks:
+    await Task.updateMany({ tags: tagId }, { $pull: { tags: tagId } });
+
     res.status(200).json(deletedTag);
   } catch (error) {
     console.error("Error deleting tag by ID:", error);
