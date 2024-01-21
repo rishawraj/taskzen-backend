@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { List } from "../models/List";
-import { ListType } from "../types/types";
+import { ConflictError, ListType } from "../types/types";
 import { Task } from "../models/Task";
 
 export const createList = async (
@@ -14,16 +14,28 @@ export const createList = async (
     }
 
     const listData = req.body as ListType;
+
+    const existingList = await Task.findOne({
+      name: listData.name,
+    });
+
+    if (existingList) {
+      throw new ConflictError("Task with the same name already exists");
+    }
+
     listData.user = req.user.userId;
-    //? add tasks??
 
     const newList = new List(listData);
     const savedList = await newList.save();
 
     res.status(201).json(savedList);
   } catch (error) {
-    console.error("Error creating List:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    if (error instanceof ConflictError) {
+      res.status(409).json({ error: "List with the same nmae already exists" });
+    } else {
+      console.error("Error creating List:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 };
 

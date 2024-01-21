@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 // import { Task } from "../models/Task";
 import { Task } from "../models/Task";
-import { TaskType } from "../types/types";
+import { ConflictError, TaskType } from "../types/types";
 
 // Create a new task
 export const createTask = async (
@@ -15,16 +15,33 @@ export const createTask = async (
     }
 
     const taskData = req.body as TaskType;
+
+    const existingTask = await Task.findOne({
+      title: taskData.title,
+    });
+
+    if (existingTask) {
+      throw new ConflictError("Task with the same title already exists");
+    }
+
     taskData.user = req.user.userId;
 
     const newTask = new Task(taskData);
     const savedTask = await newTask.save();
     res.status(201).json(savedTask);
   } catch (error) {
-    console.error("Error creating task:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    if (error instanceof ConflictError) {
+      res
+        .status(409)
+        .json({ error: "Task with the same title already exists" });
+    } else {
+      console.error("Error creating task:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 };
+
+// delete all tasks
 export const deleteAllTasks = async (
   req: Request,
   res: Response
@@ -49,8 +66,6 @@ export const getAllTasks = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("getallTasks called");
-
   try {
     if (!req.user) {
       res.status(401).json({ error: "Unauthorized" });
@@ -72,8 +87,6 @@ export const getTaskById = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  console.log("getTaskById called");
-
   try {
     const taskId = req.params.id;
 
@@ -98,6 +111,7 @@ export const updateTaskById = async (
 ): Promise<void> => {
   try {
     const taskId = req.params.id;
+
     const updatedTaskData = req.body as TaskType;
 
     const updatedTask = await Task.findByIdAndUpdate(taskId, updatedTaskData, {

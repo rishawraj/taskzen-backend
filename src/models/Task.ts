@@ -14,7 +14,12 @@ const subTaskSchema = new Schema<SubTaskType>({
 const taskSchema = new Schema<TaskType>(
   {
     title: { type: String, required: true },
-    completed: { type: Boolean, default: false, required: true },
+    completed: {
+      type: Boolean,
+      default: false,
+      required: true,
+      updatedAt: Date,
+    },
     description: { type: String },
     selectedListItem: { type: Schema.Types.ObjectId, ref: "List" },
     dueDate: { type: Date, default: null },
@@ -24,6 +29,7 @@ const taskSchema = new Schema<TaskType>(
   },
   { timestamps: true } // Add timestamps for createdAt and updatedAt
 );
+
 const Task = model<TaskType>("Task", taskSchema);
 
 export { Task };

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Tag } from "../models/Tag";
-import { TagType } from "../types/types";
+import { ConflictError, TagType } from "../types/types";
 import { Task } from "../models/Task";
 
 export const createTag = async (req: Request, res: Response): Promise<void> => {
@@ -10,14 +10,26 @@ export const createTag = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     const tagData = req.body as TagType;
+    const existingTag = await Task.findOne({
+      title: tagData.name,
+    });
+
+    if (existingTag) {
+      throw new ConflictError("Tag with the same name already exists");
+    }
+
     tagData.user = req.user.userId;
     const newTag = new Tag(tagData);
     const savedTag = await newTag.save();
 
     res.status(201).json(savedTag);
   } catch (error) {
-    console.error("Error creating Tag:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    if (error instanceof ConflictError) {
+      res.status(409).json({ error: "Tag with the same name already exists" });
+    } else {
+      console.error("Error creating Tag:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   }
 };
 

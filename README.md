@@ -21,7 +21,7 @@ TaskZen Backend is the server-side application for managing tasks, lists, and ta
 1. Clone the respository:
 
    ```
-   git clone https://github.com/your-username/taskzen-backend.git
+   git clone https://github.com/rishawraj/taskzen-backend.git
    ```
 
 1. Install dependencies:
@@ -29,7 +29,6 @@ TaskZen Backend is the server-side application for managing tasks, lists, and ta
    ```
    cd taskzen-backend
    npm install
-
    ```
 
 1. Set up the environment variables;

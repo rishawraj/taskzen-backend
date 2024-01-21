@@ -1,5 +1,17 @@
 import { Types } from "mongoose";
 
+declare global {
+  namespace Express {
+    interface Request {
+      user: {
+        email: string;
+        userId: Types.ObjectId;
+        iat: number;
+      };
+    }
+  }
+}
+
 export interface SubTaskType {
   _id: Types.ObjectId;
   title: string;
@@ -26,8 +38,8 @@ export interface TaskType {
 export interface ListType {
   _id: Types.ObjectId;
   name: string;
-  tasks: Types.ObjectId[];
-  user: Types.ObjectId;
+  tasks?: Types.ObjectId[];
+  user?: Types.ObjectId;
 }
 
 export interface TagType {
@@ -47,14 +59,9 @@ export interface UserType {
   tags: Types.ObjectId[];
 }
 
-declare global {
-  namespace Express {
-    interface Request {
-      user: {
-        email: string;
-        userId: Types.ObjectId;
-        iat: number;
-      };
-    }
+export class ConflictError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ConflictError";
   }
 }
