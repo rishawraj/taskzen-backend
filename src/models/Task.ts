@@ -25,6 +25,7 @@ const taskSchema = new Schema<TaskType>(
     dueDate: { type: Date, default: null },
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     subTasks: [subTaskSchema],
+    // subTasks: [{ type: Schema.Types.ObjectId, ref: "SubTask" }],
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true } // Add timestamps for createdAt and updatedAt

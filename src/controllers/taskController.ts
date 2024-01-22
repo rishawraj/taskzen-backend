@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-// import { Task } from "../models/Task";
 import { Task } from "../models/Task";
 import { ConflictError, TaskType } from "../types/types";
+import { Tag } from "../models/Tag";
 
 // Create a new task
 export const createTask = async (
@@ -14,7 +14,7 @@ export const createTask = async (
       return;
     }
 
-    const taskData = req.body as TaskType;
+    const taskData: Partial<TaskType> = req.body;
 
     const existingTask = await Task.findOne({
       title: taskData.title,
@@ -112,7 +112,17 @@ export const updateTaskById = async (
   try {
     const taskId = req.params.id;
 
-    const updatedTaskData = req.body as TaskType;
+    let updatedTaskData: Partial<TaskType> = req.body;
+
+    console.log(updatedTaskData);
+
+    if (updatedTaskData.selectedListItem === "") {
+      delete updatedTaskData.selectedListItem;
+      const unsetField = {
+        $unset: { selectedListItem: 1 },
+      };
+      updatedTaskData = { ...updatedTaskData, ...unsetField };
+    }
 
     const updatedTask = await Task.findByIdAndUpdate(taskId, updatedTaskData, {
       new: true,
@@ -150,3 +160,52 @@ export const deleteTaskById = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const getAllTaskTags = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const taskId = req.params.id;
+
+    const task = await Task.findById(taskId);
+
+    if (!task) {
+      res.status(404).json({ message: "Task not found" });
+      return;
+    }
+
+    const tagIds = task.tags;
+
+    const tags = await Tag.find({ _id: { $in: tagIds } });
+
+    res.status(200).json(tags);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// export const getAllSubTasks = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const taskId = req.params.id;
+
+//     const task = await Task.findById(taskId);
+
+//     if (!task) {
+//       res.status(404).json({ message: "Task not found" });
+//     }
+
+//     const subTasksIds = task?.subTasks;
+
+//     const subTasks = await SubTask.find({ _id: { $in: subTasksIds } });
+
+//     res.status(200).json(subTasks);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
