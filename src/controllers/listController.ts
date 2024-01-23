@@ -15,12 +15,12 @@ export const createList = async (
 
     const listData = req.body as ListType;
 
-    const existingList = await Task.findOne({
+    const existingList = await List.findOne({
       name: listData.name,
     });
 
     if (existingList) {
-      throw new ConflictError("Task with the same name already exists");
+      throw new ConflictError("List with the same name already exists");
     }
 
     listData.user = req.user.userId;
@@ -68,6 +68,13 @@ export const deleteAllLists = async (
     }
 
     const deletedLists = await List.deleteMany();
+
+    // Remove selectedListItem from all Tasks
+
+    await Task.updateMany(
+      { user: req.user.userId }, // Update all tasks for the logged-in user
+      { $unset: { selectedListItem: "" } } // Remove the selectedListItem field
+    );
 
     res.status(200).json({ message: "All Lists deleted", deletedLists });
   } catch (error) {

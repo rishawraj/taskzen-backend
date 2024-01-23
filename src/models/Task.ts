@@ -1,5 +1,5 @@
 import { Schema, model, Types } from "mongoose";
-import { TaskType, SubTaskType } from "../types/types";
+import { TaskType, SubTaskType, ListType } from "../types/types";
 
 const subTaskSchema = new Schema<SubTaskType>({
   _id: {
@@ -9,6 +9,11 @@ const subTaskSchema = new Schema<SubTaskType>({
   },
   title: { type: String, required: true },
   completed: { type: Boolean, default: false },
+});
+
+const listItemSchema = new Schema<ListType>({
+  _id: Schema.Types.ObjectId,
+  name: String,
 });
 
 const taskSchema = new Schema<TaskType>(
@@ -21,7 +26,8 @@ const taskSchema = new Schema<TaskType>(
       updatedAt: Date,
     },
     description: { type: String },
-    selectedListItem: { type: Schema.Types.ObjectId, ref: "List" },
+    // selectedListItem: { type: Schema.Types.ObjectId, ref: "List" },
+    selectedListItem: { type: listItemSchema, ref: "List" },
     dueDate: { type: Date, default: null },
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     subTasks: [subTaskSchema],

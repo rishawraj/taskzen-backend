@@ -23,10 +23,10 @@ export interface TagType {
   name: string;
 }
 
-// export interface selectedListItemType {
-//   _id: Types.ObjectId | "";
-//   name: string;
-// }
+export interface selectedListItemType {
+  _id: Types.ObjectId | string;
+  name: string;
+}
 
 export interface TaskType {
   _id: Types.ObjectId;
@@ -34,8 +34,7 @@ export interface TaskType {
   completed: boolean;
   description?: string;
   subTasks?: SubTaskType[];
-  selectedListItem?: Types.ObjectId | string;
-  // selectedListItem?: selectedListItemType;
+  selectedListItem?: selectedListItemType | null;
   dueDate?: Date;
   tags?: Types.ObjectId[];
   user: Types.ObjectId;

@@ -10,7 +10,7 @@ export const createTag = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     const tagData = req.body as TagType;
-    const existingTag = await Task.findOne({
+    const existingTag = await Tag.findOne({
       title: tagData.name,
     });
 
@@ -61,6 +61,12 @@ export const deleteAllTags = async (
     }
 
     const deletedTags = await Tag.deleteMany();
+  
+    // remove tags from all tasks
+    await Task.updateMany(
+      { user: req.user.userId }, // Update all tasks for the logged-in user
+      { $unset: { tags: [] } } // Remove the selectedListItem field
+    );
     res.status(200).json({ message: "deleted all tags", deletedTags });
   } catch (error) {
     console.error("Error getting Tags:", error);

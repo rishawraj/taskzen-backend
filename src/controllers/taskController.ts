@@ -114,9 +114,13 @@ export const updateTaskById = async (
 
     let updatedTaskData: Partial<TaskType> = req.body;
 
-    console.log(updatedTaskData);
+    // console.log(updatedTaskData);
+    // console.log(updatedTaskData.selectedListItem);
 
-    if (updatedTaskData.selectedListItem === "") {
+    if (
+      updatedTaskData.selectedListItem &&
+      updatedTaskData.selectedListItem._id === ""
+    ) {
       delete updatedTaskData.selectedListItem;
       const unsetField = {
         $unset: { selectedListItem: 1 },
@@ -127,6 +131,8 @@ export const updateTaskById = async (
     const updatedTask = await Task.findByIdAndUpdate(taskId, updatedTaskData, {
       new: true,
     });
+
+    // console.log(updatedTask);
 
     if (!updatedTask) {
       res.status(404).json({ error: "Task not found" });
@@ -185,27 +191,3 @@ export const getAllTaskTags = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-// export const getAllSubTasks = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const taskId = req.params.id;
-
-//     const task = await Task.findById(taskId);
-
-//     if (!task) {
-//       res.status(404).json({ message: "Task not found" });
-//     }
-
-//     const subTasksIds = task?.subTasks;
-
-//     const subTasks = await SubTask.find({ _id: { $in: subTasksIds } });
-
-//     res.status(200).json(subTasks);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
