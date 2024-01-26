@@ -26,15 +26,13 @@ const taskSchema = new Schema<TaskType>(
       updatedAt: Date,
     },
     description: { type: String },
-    // selectedListItem: { type: Schema.Types.ObjectId, ref: "List" },
-    selectedListItem: { type: listItemSchema, ref: "List" },
+    selectedListItem: { type: listItemSchema },
     dueDate: { type: Date, default: null },
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
     subTasks: [subTaskSchema],
-    // subTasks: [{ type: Schema.Types.ObjectId, ref: "SubTask" }],
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
-  { timestamps: true } // Add timestamps for createdAt and updatedAt
+  { timestamps: true }
 );
 
 const Task = model<TaskType>("Task", taskSchema);

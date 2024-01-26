@@ -156,12 +156,12 @@ export const deleteListById = async (
     }
 
     // Remove list refrence from tasks
-    await Task.updateMany(
-      { selectedListItem: listId },
-      { $pull: { selectedListItem: listId } }
+    const message = await Task.updateMany(
+      { selectedListItem: { _id: deletedList._id, name: deletedList.name } },
+      { $unset: { selectedListItem: 1 } }
     );
 
-    res.status(200).json(deletedList);
+    res.status(200).json({ deletedList: deletedList, updatedTasks: message });
   } catch (error) {
     console.error("Error deleting list by ID:", error);
     res.status(500).json({ error: "Internal Server Error" });

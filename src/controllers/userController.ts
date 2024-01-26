@@ -70,6 +70,26 @@ export const updateUserById = async (
   }
 };
 
+export const getUserById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.params.id;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error updating the user by ID:", error);
+    res.status(500).json({ error: "Internal Sever Error" });
+  }
+};
+
 export const deleteUserById = async (
   req: Request,
   res: Response
